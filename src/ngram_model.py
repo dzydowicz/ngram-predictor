@@ -66,6 +66,7 @@ class NGramModel:
             return
 
         self.vocabulary.update(tokens)
+
         pad: list[str] = ["<s>"] * (self.n - 1)
         seq: list[str] = pad + tokens
 
@@ -91,7 +92,7 @@ class NGramModel:
             prob: float = self.probability(context, w)
             if prob > best_prob:
                 best_word = w
-                best_prob = float(p)
+                best_prob = float(prob)
 
         return best_word
 
@@ -100,7 +101,7 @@ class NGramModel:
         Computes the Laplace-smoothed probability of a word given its context.
         :return: float Smoothed conditional probability
             P(word | context) = (count(context + word) + alpha)
-                                / (count(context) * alpha * V)
+                                / (count(context) + alpha * V)
             where:
                 - alpha: parameter for Laplace smoothing,
                 - V: number of unique tokens.
