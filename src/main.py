@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 from typing import Optional
@@ -6,6 +7,32 @@ from src.data_preprocessing import read_and_clean_corpus
 from src.ngram_model import NGramModel
 from src.perplexity import compute_perplexity
 
+
+def parse_args() -> argparse.Namespace:
+    """
+    Parses command-line arguments.
+    :return: Namespace with parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Train and interact with N-gram language models."
+    )
+    parser.add_argument(
+        "--corpus",
+        required = True,
+        help = "Path to the corpus file."
+    )
+    parser.add_argument(
+        '--alpha', '-a',
+        type = float,
+        default = 1.0,
+        help = 'Laplace smoothing parameter (default: 1.0)'
+    )
+    parser.add_argument(
+        '--override-models', '-o',
+        action = 'store_true',
+        help = 'Force retraining by overriding existing saved models'
+    )
+    return parser.parse_args()
 
 def save_tokens_to_file(tokens: list[str], output_path: str):
     """
@@ -23,19 +50,28 @@ def save_tokens_to_file(tokens: list[str], output_path: str):
 def train_and_evaluate(
         train_tokens: list[str],
         test_tokens: list[str],
-        orders: list[int]
+        orders: list[int],
+        alpha: float = 1.0,
+        override: bool = False
 ) -> dict[int, NGramModel]:
    """
-   Trains NGram model and evaluates it.
+   Trains NGram models for specified orders, evaluates perplexity.
+
+   :param train_tokens: List of tokens to train on.
+   :param test_tokens: List of tokens to test on.
+   :param orders: List of n-gram orders.
+   :param override: If true, existing models are retrained regardless of saved files.
    """
-   alpha: float = 1.0
    models: dict[int, NGramModel] = {}
 
    for n in orders:
        model: NGramModel = NGramModel(n, alpha)
+
+       if override and os.path.isfile(model.model_path):
+           os.remove(model.model_path)
+
        model.train(train_tokens)
        models[n] = model
-       print(f"Trained {n}-gram model.")
 
        perplexity: float = compute_perplexity(model, test_tokens)
        print(f"Perplexity for {n}-gram model: {perplexity}.")
@@ -43,11 +79,9 @@ def train_and_evaluate(
    return models
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <path_to_text_file>")
-        sys.exit(1)
+    args = parse_args()
 
-    file_path: str = sys.argv[1]
+    file_path: str = args.corpus
     output_path = os.path.join("data", "tokens_output.txt")
 
     # 1. Read and clean corpus
@@ -67,17 +101,21 @@ def main():
 
     # 2. Train models for n = 1,2,3,4
     default_orders: list[int] = [1, 2, 3, 4]
-    models: dict[int, NGramModel] = train_and_evaluate(train_tokens, test_tokens, default_orders)
+    models: dict[int, NGramModel] = train_and_evaluate(train_tokens,
+                                                       test_tokens,
+                                                       default_orders,
+                                                       alpha=args.alpha,
+                                                       override=args.override_models)
 
     max_ctx = max(default_orders) - 1
 
     print(f"----------------------------------------------------------")
-    print(f"Enter up to {max_ctx} words as context or '!exit' to quit.")
+    print(f"Enter up to {max_ctx} words as context or '!q' to quit.")
     while True:
         # 3. Get and validate user input
         user_input: str = input(f"Context> ").strip()
 
-        if user_input.lower() == "!exit":
+        if user_input.lower() == "!q":
             print("Quitting.")
             break
 
