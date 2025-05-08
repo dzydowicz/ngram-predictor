@@ -1,10 +1,13 @@
 import os
 import sys
+from typing import Optional
+
 from src.data_preprocessing import read_and_clean_corpus
 from src.ngram_model import NGramModel
+from src.perplexity import compute_perplexity
 
 
-def save_tokens_to_file(tokens, output_path):
+def save_tokens_to_file(tokens: list[str], output_path: str):
     """
     Saves a list of tokens to a text file, one per line.
 
@@ -17,13 +20,34 @@ def save_tokens_to_file(tokens, output_path):
             f.write(f"{token}\n")
     print(f"Tokens saved to '{output_path}'.")
 
+def train_and_evaluate(
+        train_tokens: list[str],
+        test_tokens: list[str],
+        orders: list[int]
+) -> dict[int, NGramModel]:
+   """
+   Trains NGram model and evaluates it.
+   """
+   alpha: float = 1.0
+   models: dict[int, NGramModel] = {}
+
+   for n in orders:
+       model: NGramModel = NGramModel(n, alpha)
+       model.train(train_tokens)
+       models[n] = model
+       print(f"Trained {n}-gram model.")
+
+       perplexity: float = compute_perplexity(model, test_tokens)
+       print(f"Perplexity for {n}-gram model: {perplexity}.")
+
+   return models
 
 def main():
     if len(sys.argv) < 2:
         print("Usage: python main.py <path_to_text_file>")
         sys.exit(1)
 
-    file_path = sys.argv[1]
+    file_path: str = sys.argv[1]
     output_path = os.path.join("data", "tokens_output.txt")
 
     # 1. Read and clean corpus
@@ -35,30 +59,29 @@ def main():
         print(f"Error: {e}")
         sys.exit(1)
 
+    split_ratio: float = 0.8
+    split_idx: int = int(len(tokens) * split_ratio)
+    train_tokens: list[str] = tokens[:split_idx]
+    test_tokens: list[str] = tokens[split_idx:]
+    print(f"Training on {len(train_tokens)} tokens, testing on {len(test_tokens)} tokens.")
+
     # 2. Train models for n = 1,2,3,4
-    default_orders = [1, 2, 3, 4]
-    alpha = 1.0
-    models = {}
-
-    for n in default_orders:
-        model = NGramModel(n, alpha)
-        model.train(tokens)
-        models[n] = model
-
-    print(f"Models trained for orders: {default_orders}.")
+    default_orders: list[int] = [1, 2, 3, 4]
+    models: dict[int, NGramModel] = train_and_evaluate(train_tokens, test_tokens, default_orders)
 
     max_ctx = max(default_orders) - 1
 
+    print(f"----------------------------------------------------------")
     print(f"Enter up to {max_ctx} words as context or '!exit' to quit.")
     while True:
         # 3. Get and validate user input
-        user_input = input(f"Context> ").strip()
+        user_input: str = input(f"Context> ").strip()
 
         if user_input.lower() == "!exit":
             print("Quitting.")
             break
 
-        context_tokens = user_input.lower().split()
+        context_tokens: list[str] = user_input.lower().split()
         m = len(context_tokens)
 
         if m > max_ctx:
@@ -66,15 +89,15 @@ def main():
             continue
 
         # 4. Pick a model
-        order = m + 1
-        model = models.get(order)
+        order: int = m + 1
+        model: Optional[NGramModel] = models.get(order)
         if model is None:
             print(f"Error: No model for {order}.")
             continue
 
         # 5. Predict next word
         try:
-            next_word = model.predict_next(tuple(context_tokens))
+            next_word: Optional[str] = model.predict_next(tuple(context_tokens))
             print(f"Predicted next word: '{next_word}'.")
         except Exception as e:
             print(f"Prediction error: {e}")

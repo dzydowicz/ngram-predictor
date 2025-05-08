@@ -6,7 +6,7 @@ Module responsible for reading and pre-processing text corpus.
 It provides functions for validation, cleaning and tokenizing the text.
 """
 
-def read_and_clean_corpus(file_path:str, min_tokens=2000):
+def read_and_clean_corpus(file_path: str, min_tokens: int = 2000) -> list[str]:
     """
     Reads a text file and preprocesses it to produce a list of tokens.
 
@@ -20,7 +20,7 @@ def read_and_clean_corpus(file_path:str, min_tokens=2000):
         raise FileNotFoundError(f"File {file_path} does not exist.")
 
     with open(file_path, 'r', encoding='utf-8') as file:
-        text = file.read()
+        text: str = file.read()
 
     if not text.strip():
         raise ValueError(f"Plik '{file_path}' jest pusty.")
@@ -29,7 +29,7 @@ def read_and_clean_corpus(file_path:str, min_tokens=2000):
     text = re.sub(r'[^a-ząćęłńóśźż\s]', '', text)
     text = re.sub(r'\s+', ' ', text).strip()
 
-    tokens = text.split()
+    tokens: list[str] = text.split()
 
     if len(tokens) < min_tokens:
         raise ValueError(

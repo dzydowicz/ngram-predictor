@@ -2,14 +2,28 @@
 import os
 import pickle
 from collections import defaultdict
+from typing import Optional, Any
 
 
 class NGramModel:
     """
     N-gram model with Laplace smoothing.
+
+    Attributes
+    ----------
+    n : int
+        The order of the n-gram (e.g. 2 for bigrams, 3 for trigrams).
+    alpha : float
+        Laplace smoothing parameter.
+    ngram_counts : defaultdict(int)
+        Counts of each n-gram observed during training.
+    context_counts : defaultdict(int)
+        Counts of each (n-1)-gram (context) observed during training.
+    vocabulary : set[str]
+        The set of unique tokens seen during training.
     """
 
-    def __init__(self, n:int, alpha=1.0, model_dir="data/processed"):
+    def __init__(self, n: int, alpha=1.0, model_dir="data/processed"):
         """
         :param n: the order of the n-gram.
         :param alpha: Laplace smoothing parameter.
@@ -38,7 +52,7 @@ class NGramModel:
         model.vocabulary = set(data["vocabulary"])
         return model
 
-    def train(self, tokens):
+    def train(self, tokens: list[str]) -> None:
         """
         If the file at self.model_path exists, loads the model from this file.
         Otherwise, computes n-grams, updates dictionary, and saves the model.
@@ -52,44 +66,58 @@ class NGramModel:
             return
 
         self.vocabulary.update(tokens)
-        pad = ["<s>"] * (self.n - 1)
-        seq = pad + tokens
+        pad: list[str] = ["<s>"] * (self.n - 1)
+        seq: list[str] = pad + tokens
 
         for i in range(len(seq) - self.n + 1):
-            gram = tuple(seq[i : i + self.n])
-            ctx = gram[:-1]
+            gram: tuple[str, ...] = tuple(seq[i : i + self.n])
+            ctx: tuple[str, ...] = gram[:-1]
             self.ngram_counts[gram] += 1
             self.context_counts[ctx] += 1
 
         self._save()
 
-    def predict_next(self, context):
+    def predict_next(self, context) -> Optional[str]:
+        """
+        Predict the most likely next word for a given context.
+        """
         if len (context) != self.n - 1:
             raise ValueError(f"Content length {len(context)} is not {self.n - 1}.")
 
-        best_word, best_prob = None, 0.0
+        best_word: Optional[str] = None
+        best_prob: float = 0.0
 
         for w in self.vocabulary:
-            p = self.probability(context, w)
-            if p > best_prob:
+            prob: float = self.probability(context, w)
+            if prob > best_prob:
                 best_word = w
                 best_prob = float(p)
 
         return best_word
 
-    def _probability(self, context, word):
+    def probability(self, context, word) -> float:
+        """
+        Computes the Laplace-smoothed probability of a word given its context.
+        :return: float Smoothed conditional probability
+            P(word | context) = (count(context + word) + alpha)
+                                / (count(context) * alpha * V)
+            where:
+                - alpha: parameter for Laplace smoothing,
+                - V: number of unique tokens.
+        """
         if len(context) != self.n - 1:
             raise ValueError(f"Content length {len(context)} is not {self.n - 1}.")
 
-        count_ng = self.ngram_counts[context + (word,)]
-        count_ctx = self.context_counts[context]
-        V = len(self.vocabulary)
+        count_ng: int = self.ngram_counts[context + (word,)]
+        count_ctx: int = self.context_counts[context]
+        V: int = len(self.vocabulary)
 
-        num = count_ng + self.alpha
-        den = count_ctx + self.alpha * V
+        num: float = count_ng + self.alpha
+        den: float = count_ctx + self.alpha * V
+
         return num / den if den > 0 else 0.0
 
-    def _save(self):
+    def _save(self) -> None:
         """
         Saves the model to a pickle file.
         """
