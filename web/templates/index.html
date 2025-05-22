@@ -14,32 +14,36 @@
             <p class="subtitle">Powered by N-gram Model</p>
         </div>
         
-        <div class="input-container">
-            <div class="input-group">
-                <label for="context">Enter your text (up to 3 words):</label>
-                <div class="input-wrapper">
-                    <input type="text" id="context" placeholder="Type here..." autocomplete="off">
-                    <button class="clear-btn" id="clearBtn" title="Clear input">
-                        <i class="fas fa-times"></i>
-                    </button>
+        <div class="app-content">
+            <div class="input-container">
+                <div class="input-group">
+                    <label for="context">Enter your text (up to 3 words):</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="context" placeholder="Type here..." autocomplete="off">
+                        <button class="clear-btn" id="clearBtn" title="Clear input">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            
-            <button id="predictBtn" class="predict-btn">
-                <span class="btn-text">Predict Next Word</span>
-                <div class="loader"></div>
-            </button>
-        </div>
-
-        <div id="error" class="error"></div>
-        
-        <div id="result" class="result">
-            <div class="prediction-header">Predicted next word:</div>
-            <div class="prediction-content">
-                <span id="prediction" class="prediction-text"></span>
-                <button id="usePredict" class="use-prediction" title="Use this prediction">
-                    <i class="fas fa-plus"></i>
+                
+                <button id="predictBtn" class="predict-btn">
+                    <span class="btn-text">Predict Next Word</span>
+                    <div class="loader"></div>
                 </button>
+            </div>
+
+            <div id="error" class="error"></div>
+            
+            <div class="result-container">
+                <div class="prediction-header">Predicted next word:</div>
+                <div id="result" class="result">
+                    <div class="prediction-content">
+                        <span id="prediction" class="prediction-text">Type something to see prediction</span>
+                        <button id="usePredict" class="use-prediction" title="Use this prediction">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

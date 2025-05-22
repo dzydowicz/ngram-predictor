@@ -61,8 +61,14 @@ h1 {
     font-size: 0.95rem;
 }
 
+.app-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
 .input-container {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
 }
 
 .input-group {
@@ -175,17 +181,10 @@ input[type="text"]:focus {
     animation: fadeIn 0.3s ease;
 }
 
-.result {
+.result-container {
     background: var(--result-bg);
     border-radius: 8px;
     padding: 1rem;
-    margin-top: 1.5rem;
-    display: none;
-    animation: slideUp 0.3s ease;
-}
-
-.result.show {
-    display: block;
 }
 
 .prediction-header {
@@ -194,16 +193,29 @@ input[type="text"]:focus {
     margin-bottom: 0.5rem;
 }
 
+.result {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
 .prediction-content {
     display: flex;
     align-items: center;
     gap: 1rem;
+    width: 100%;
 }
 
 .prediction-text {
     font-size: 1.25rem;
     font-weight: 500;
     color: var(--text-color);
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+.result.show .prediction-text {
+    opacity: 1;
 }
 
 .use-prediction {
@@ -218,6 +230,13 @@ input[type="text"]:focus {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.result.show .use-prediction {
+    opacity: 1;
+    visibility: visible;
 }
 
 .use-prediction:hover {
@@ -228,17 +247,6 @@ input[type="text"]:focus {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 @media (max-width: 640px) {

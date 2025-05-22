@@ -38,7 +38,7 @@ function clearInput() {
 // Hide prediction results
 function hideResults() {
     resultDiv.classList.remove('show');
-    predictionSpan.textContent = '';
+    predictionSpan.textContent = 'Type something to see prediction';
 }
 
 // Show loading state
