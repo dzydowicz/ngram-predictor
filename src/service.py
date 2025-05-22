@@ -42,6 +42,7 @@ class NGramService:
 
         self.tokens: List[str] = []
         self.models: Dict[int, NGramModel] = {}
+        self.perplexities: Dict[str, float] = {}
 
         self._startup()
 
@@ -62,6 +63,16 @@ class NGramService:
             raise RuntimeError(f"No model for {order}.")
 
         return model.predict_next(tuple(map(str.lower, context)))
+        
+    def get_model_stats(self) -> Dict:
+        """
+        Returns model statistics including stored perplexity values.
+        """
+        return {
+            "perplexity": self.perplexities,
+            "vocabulary_size": len(self.tokens),
+            "alpha": self.alpha
+        }
 
     def _startup(self) -> None:
         output_path = os.path.join("data", "tokens_output.txt")
@@ -107,6 +118,7 @@ class NGramService:
             models[n] = model
 
             perplexity: float = compute_perplexity(model, test_tokens)
+            self.perplexities[f"{n}-gram"] = round(perplexity, 2)
             print(f"Perplexity for {n}-gram model: {perplexity}.")
 
         return models

@@ -19,6 +19,12 @@ const predictionSpan = document.getElementById('prediction');
 const predictBtn = document.getElementById('predictBtn');
 const clearBtn = document.getElementById('clearBtn');
 const usePredictBtn = document.getElementById('usePredict');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeModal = document.getElementById('closeModal');
+const alphaValue = document.getElementById('alphaValue');
+const vocabSize = document.getElementById('vocabSize');
+const perplexityStats = document.getElementById('perplexityStats');
 
 // Validate input text
 function validateInput(text) {
@@ -126,6 +132,56 @@ function usePrediction() {
     }
 }
 
+// Open settings modal and fetch model stats
+async function openSettingsModal() {
+    settingsModal.classList.add('show');
+    await fetchModelStats();
+}
+
+// Close settings modal
+function closeSettingsModal() {
+    settingsModal.classList.remove('show');
+}
+
+// Fetch model statistics
+async function fetchModelStats() {
+    try {
+        // Show loading state
+        perplexityStats.innerHTML = `
+            <div class="stat-loader">
+                <div class="spinner"></div>
+                <p>Loading statistics...</p>
+            </div>
+        `;
+        
+        const response = await fetch('http://localhost:8000/model-stats');
+        const data = await response.json();
+        
+        // Update model info
+        alphaValue.textContent = data.alpha;
+        vocabSize.textContent = data.vocabulary_size;
+        
+        // Create perplexity cards
+        let perplexityHtml = '';
+        for (const [gramType, value] of Object.entries(data.perplexity)) {
+            perplexityHtml += `
+                <div class="perplexity-card">
+                    <div class="ngram-label">${gramType}</div>
+                    <div class="perplexity-value">${value}</div>
+                </div>
+            `;
+        }
+        
+        perplexityStats.innerHTML = perplexityHtml;
+    } catch (error) {
+        perplexityStats.innerHTML = `
+            <div style="grid-column: span 2; text-align: center; color: var(--error-color);">
+                Failed to load model statistics. Please try again.
+            </div>
+        `;
+    }
+}
+
 // Handle input with validation and debounce
 const debouncedPrediction = debounce(() => getPrediction(false), 500);
 contextInput.addEventListener('input', (e) => {
@@ -142,6 +198,22 @@ contextInput.addEventListener('input', (e) => {
 predictBtn.addEventListener('click', () => getPrediction(true));
 clearBtn.addEventListener('click', clearInput);
 usePredictBtn.addEventListener('click', usePrediction);
+settingsBtn.addEventListener('click', openSettingsModal);
+closeModal.addEventListener('click', closeSettingsModal);
+
+// Handle click outside modal to close it
+window.addEventListener('click', (e) => {
+    if (e.target === settingsModal) {
+        closeSettingsModal();
+    }
+});
+
+// Handle ESC key to close modal
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && settingsModal.classList.contains('show')) {
+        closeSettingsModal();
+    }
+});
 
 // Handle Enter key
 contextInput.addEventListener('keypress', (e) => {
