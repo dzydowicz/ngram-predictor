@@ -20,6 +20,13 @@ const predictBtn = document.getElementById('predictBtn');
 const clearBtn = document.getElementById('clearBtn');
 const usePredictBtn = document.getElementById('usePredict');
 
+// Validate input text
+function validateInput(text) {
+    // Allow letters (including Polish), and spaces
+    const letterOnlyRegex = /^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ\s]*$/;
+    return letterOnlyRegex.test(text);
+}
+
 // Clear input and results
 function clearInput() {
     contextInput.value = '';
@@ -36,8 +43,15 @@ function hideResults() {
 
 // Show loading state
 function setLoading(isLoading) {
-    predictBtn.classList.toggle('loading', isLoading);
-    predictBtn.disabled = isLoading;
+    if (isLoading) {
+        predictBtn.classList.add('loading');
+        predictBtn.disabled = true;
+    } else {
+        setTimeout(() => {
+            predictBtn.classList.remove('loading');
+            predictBtn.disabled = false;
+        }, 300); // Small delay to ensure smooth transition
+    }
 }
 
 // Show error message
@@ -50,6 +64,13 @@ function showError(message) {
 // Get prediction from API
 async function getPrediction(isUserAction = false) {
     const context = contextInput.value.trim();
+    
+    // Validate input
+    if (context && !validateInput(context)) {
+        showError('Context can only contain letters and spaces.');
+        return;
+    }
+    
     const words = context ? context.split(/\s+/) : [];
     
     // Clear previous results
@@ -105,8 +126,19 @@ function usePrediction() {
     }
 }
 
+// Handle input with validation and debounce
+const debouncedPrediction = debounce(() => getPrediction(false), 500);
+contextInput.addEventListener('input', (e) => {
+    const value = e.target.value;
+    if (value && !validateInput(value)) {
+        showError('Context can only contain letters and spaces.');
+        hideResults();
+        return;
+    }
+    debouncedPrediction();
+});
+
 // Event listeners
-contextInput.addEventListener('input', debounce(() => getPrediction(false), 500));
 predictBtn.addEventListener('click', () => getPrediction(true));
 clearBtn.addEventListener('click', clearInput);
 usePredictBtn.addEventListener('click', usePrediction);

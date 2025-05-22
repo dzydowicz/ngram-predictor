@@ -126,10 +126,7 @@ input[type="text"]:focus {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    position: relative;
 }
 
 .predict-btn:hover {
@@ -143,12 +140,17 @@ input[type="text"]:focus {
 
 .loader {
     display: none;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     border-top-color: white;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s linear infinite;
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
 }
 
 @keyframes spin {
@@ -160,7 +162,7 @@ input[type="text"]:focus {
 }
 
 .loading .btn-text {
-    display: none;
+    opacity: 0.7;
 }
 
 .error {
