@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-gram word predictor</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>N-gram word predictor</h1>
+        <div class="input-group">
+            <label for="context">Enter context (up to 3 words):</label>
+            <input type="text" id="context" placeholder="Type your context here...">
+        </div>
+        <button onclick="getPrediction()">Predict</button>
+        <div id="error" class="error"></div>
+        <div id="result" class="result">
+            <div class="suggestion">Predicted next word: <span id="prediction"></span></div>
+        </div>
+    </div>
+
+    <script src="../static/js/main.js"></script>
+</body>
+</html> 
