@@ -175,3 +175,4 @@ cython_debug/
 
 # N-gram models
 data/processed
+tests/data
