@@ -49,16 +49,40 @@ python3 -m pip install -r requirements.txt
 
 ### Web Interface
 
-1. Start the FastAPI server:
+The web interface consists of two separate servers:
+
+**Option 1: Quick Start (Recommended)**
+```bash
+python start_web.py
+# or if python command not found:
+python3 start_web.py
+```
+This convenience script starts both servers automatically and provides clear status information.
+
+**Option 2: Manual Setup**
+
+**1. Start the API backend server:**
 ```bash
 python api.py
 # or if python command not found:
 python3 api.py
 ```
+This starts the FastAPI backend on `http://localhost:8000` (API endpoints only)
 
-2. Open your browser and navigate to: `http://localhost:8000`
+**2. Start the frontend web server:**
+```bash
+python web_server.py
+# or if python command not found:
+python3 web_server.py
+```
+This starts the frontend server on `http://localhost:3000`
 
-3. Enter 1-3 words as context and get the predicted next word
+**3. Usage:**
+- Open your browser and navigate to: `http://localhost:3000`
+- Enter 1-3 words as context and get the predicted next word
+- The frontend will automatically communicate with the API backend
+
+**Note:** Both servers need to be running simultaneously for the web interface to work properly.
 
 ### Command Line Interface
 
