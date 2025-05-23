@@ -16,9 +16,9 @@ A Python-based N-gram language model for predicting the next word in a sequence.
 
 The project includes a sample corpus (`data/data.txt`) containing Polish text about technology topics including artificial intelligence, programming, data analysis, machine learning, databases, cybersecurity, and computer networks. 
 
-**Note**: This sample corpus was generated using AI (ChatGPT) to provide diverse training data for demonstration purposes. For production use, consider using real-world text corpora appropriate to your specific domain.
-
 **Data Split**: The corpus is automatically divided during model training - 80% is used for training the n-gram models, and 20% is reserved for validation and perplexity calculation. This split ensures unbiased evaluation of model performance on unseen data.
+
+**Note**: This sample corpus was generated using AI (ChatGPT) to provide diverse training data for demonstration purposes. For production use, consider using real-world text corpora appropriate to your specific domain.
 
 ## Installation
 
@@ -87,28 +87,6 @@ The FastAPI server provides these endpoints:
   ```
 
 - `GET /model-stats`: Get model statistics including perplexity scores
-
-## Project Structure
-
-```
-ngram-predictor/
-├── src/                    # Core implementation
-│   ├── service.py         # Main NGramService class
-│   ├── ngram_model.py     # N-gram model implementation
-│   ├── data_preprocessing.py  # Text preprocessing utilities
-│   ├── perplexity.py      # Perplexity calculation
-│   └── main.py            # Core training logic
-├── web/                   # Web interface
-│   ├── templates/         # HTML templates
-│   └── static/           # CSS, JS, and other assets
-├── data/                  # Training data
-│   ├── data.txt          # Sample corpus (AI-generated)
-│   └── processed/        # Processed data cache
-├── api.py                # FastAPI web server
-├── cli.py                # Command-line interface
-├── run.py                # Alternative entry point
-└── requirements.txt      # Python dependencies
-```
 
 ## Technical Details
 
