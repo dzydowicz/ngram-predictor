@@ -37,7 +37,7 @@ function validateInput(text) {
 function clearInput() {
     contextInput.value = '';
     hideResults();
-    errorDiv.style.display = 'none';
+    hideError();
     contextInput.focus();
 }
 
@@ -62,9 +62,47 @@ function setLoading(isLoading) {
 
 // Show error message
 function showError(message) {
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-    resultDiv.classList.remove('show');
+    // Create or clear existing error div content
+    errorDiv.innerHTML = `
+        <div class="error-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="error-content">${message}</div>
+        <button class="error-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="error-progress"></div>
+    `;
+    
+    // Add close button event listener
+    const closeBtn = errorDiv.querySelector('.error-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            errorDiv.classList.remove('show');
+        });
+    }
+    
+    // Show the error
+    errorDiv.classList.add('show');
+    
+    // Auto-dismiss after 5 seconds
+    const autoDismissTimeout = setTimeout(() => {
+        errorDiv.classList.remove('show');
+    }, 5000);
+    
+    // Store the timeout ID so it can be cleared if the error is manually closed
+    errorDiv._dismissTimeout = autoDismissTimeout;
+}
+
+// Hide error message
+function hideError() {
+    // Clear any existing timeout
+    if (errorDiv._dismissTimeout) {
+        clearTimeout(errorDiv._dismissTimeout);
+        errorDiv._dismissTimeout = null;
+    }
+    
+    errorDiv.classList.remove('show');
 }
 
 // Get prediction from API
@@ -80,7 +118,7 @@ async function getPrediction(isUserAction = false) {
     const words = context ? context.split(/\s+/) : [];
     
     // Clear previous results
-    errorDiv.style.display = 'none';
+    hideError();
     
     // For real-time predictions (not user action), require non-empty input
     if (!isUserAction && !context) {
@@ -109,7 +147,7 @@ async function getPrediction(isUserAction = false) {
         if (data.error) {
             showError(data.error);
         } else {
-            errorDiv.style.display = 'none';
+            hideError();
             predictionSpan.textContent = data.prediction;
             resultDiv.classList.add('show');
         }

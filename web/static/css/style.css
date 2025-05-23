@@ -176,13 +176,79 @@ input[type="text"]:focus {
 }
 
 .error {
+    position: fixed;
+    top: 24px;
+    right: 24px;
     color: var(--error-color);
-    background: #fef2f2;
+    background: white;
     padding: 0.75rem 1rem;
     border-radius: 8px;
-    margin: 1rem 0;
-    display: none;
-    animation: fadeIn 0.3s ease;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15), 0 2px 4px rgba(0, 0, 0, 0.05);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 1000;
+    max-width: 320px;
+    border-left: 4px solid var(--error-color);
+}
+
+.error.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.error-icon {
+    font-size: 1.1rem;
+    color: var(--error-color);
+}
+
+.error-content {
+    flex: 1;
+}
+
+.error-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    padding: 2px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.error-close:hover {
+    color: var(--text-color);
+    background: var(--bg-color);
+}
+
+@keyframes progress {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+.error-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: var(--error-color);
+    border-radius: 0 0 0 8px;
+    opacity: 0.5;
+}
+
+.error.show .error-progress {
+    animation: progress 5s linear forwards;
 }
 
 .result-container {
@@ -515,5 +581,17 @@ input[type="text"]:focus {
     
     .stat-loader {
         grid-column: span 1;
+    }
+    
+    .error {
+        top: 16px;
+        left: 16px;
+        right: 16px;
+        max-width: none;
+        transform: translateY(-150%);
+    }
+    
+    .error.show {
+        transform: translateY(0);
     }
 } 
