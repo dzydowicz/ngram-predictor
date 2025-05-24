@@ -131,11 +131,20 @@ P(w|context) = (count(context, w) + α) / (count(context) + α × |V|)
 
 ### Prediction Strategy
 
-The model uses a backoff strategy, preferring longer contexts when available:
-1. Try 4-gram prediction (if 3 words context)
-2. Fall back to trigram (if 2+ words context)  
-3. Fall back to bigram (if 1+ words context)
-4. Fall back to unigram (most frequent word)
+The model selects the word with the highest Laplace-smoothed probability for a given context:
+
+1. **Model Selection**: Based on context length, selects the appropriate n-gram model:
+   - 0 words context → unigram model (1-gram)
+   - 1 word context → bigram model (2-gram)
+   - 2 words context → trigram model (3-gram)  
+   - 3 words context → 4-gram model
+   
+2. **Word Selection**: For the selected model, computes Laplace-smoothed probability for every word in the vocabulary:
+   ```
+   P(word | context) = (count(context + word) + α) / (count(context) + α × |V|)
+   ```
+   
+3. **Prediction**: Returns the word with the highest probability
 
 ## Example Usage
 
